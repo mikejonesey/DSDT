@@ -36,7 +36,7 @@ DefinitionBlock ("", "DSDT", 1, "HPQOEM", "SLIC-MPC", 0x00040000)
     External (AFN4, MethodObj)    // 1 Arguments
     External (AFN7, MethodObj)    // 1 Arguments
     External (DEB2, IntObj)
-    External (WLVD, UnknownObj)
+//    External (WLVD, UnknownObj)
 
     OperationRegion (SPRT, SystemIO, 0xB0, 0x02)
     Field (SPRT, ByteAcc, Lock, Preserve)
@@ -332,7 +332,7 @@ DefinitionBlock ("", "DSDT", 1, "HPQOEM", "SLIC-MPC", 0x00040000)
         Return (Local3)
     }
 
-    OperationRegion (GNVS, SystemMemory, 0xDFB47E98, 0x23)
+    OperationRegion (GNVS, SystemMemory, 0xDFB47E98, 0x00000023)
     Field (GNVS, AnyAcc, NoLock, Preserve)
     {
         DAS3,   8, 
@@ -366,7 +366,7 @@ DefinitionBlock ("", "DSDT", 1, "HPQOEM", "SLIC-MPC", 0x00040000)
         BDID,   8
     }
 
-    OperationRegion (OGNS, SystemMemory, 0xDFB47E18, 0x0E)
+    OperationRegion (OGNS, SystemMemory, 0xDFB47E18, 0x0000000E)
     Field (OGNS, AnyAcc, Lock, Preserve)
     {
         EGPO,   8, 
@@ -384,7 +384,7 @@ DefinitionBlock ("", "DSDT", 1, "HPQOEM", "SLIC-MPC", 0x00040000)
         OSYS,   16
     }
 
-    OperationRegion (NVST, SystemMemory, 0xDFB49E91, 0x012D)
+    OperationRegion (NVST, SystemMemory, 0xDFB49E91, 0x0000012D)
     Field (NVST, AnyAcc, Lock, Preserve)
     {
         SMIF,   8, 
@@ -616,7 +616,7 @@ DefinitionBlock ("", "DSDT", 1, "HPQOEM", "SLIC-MPC", 0x00040000)
 
     Name (BUFN, Zero)
     Name (MBUF, Buffer (0x1000) {})
-    OperationRegion (MDBG, SystemMemory, 0xDFB2E018, 0x1004)
+    OperationRegion (MDBG, SystemMemory, 0xDFB2E018, 0x00001004)
     Field (MDBG, AnyAcc, Lock, Preserve)
     {
         MDG0,   32768
@@ -5861,7 +5861,9 @@ DefinitionBlock ("", "DSDT", 1, "HPQOEM", "SLIC-MPC", 0x00040000)
                             }
                             Else
                             {
-                                ~Arg1
+				//Mike edit
+                                //~Arg1
+				Not(Arg1,Arg0)
                                 Arg1++
                                 ACCW (0x29, Arg1)
                             }
@@ -6978,30 +6980,31 @@ DefinitionBlock ("", "DSDT", 1, "HPQOEM", "SLIC-MPC", 0x00040000)
             Sleep (One)
         }
 
-        Device (WLBU)
-        {
-            Name (_HID, EisaId ("HPQ6001"))  // _HID: Hardware ID
-            Name (WLDP, 0xFF)
-            Method (_STA, 0, NotSerialized)  // _STA: Status
-            {
-                If ((WLDP == 0xFF))
-                {
-                    Local0 = Zero
-                    OSTP ()
-                    If ((((OSYS == 0x07DC) || (OSYS == 0x07DD)) || (OSYS == 0x07DF)))
-                    {
-                        If (((WLVD != Zero) && (WLVD != 0xFFFF)))
-                        {
-                            Local0 = 0x0F
-                        }
-                    }
-
-                    WLDP = Local0
-                }
-
-                Return (WLDP) /* \_SB_.WLBU.WLDP */
-            }
-        }
+// Mike Edit Remove WMI Stuff... 
+//        Device (WLBU)
+//        {
+//            Name (_HID, EisaId ("HPQ6001"))  // _HID: Hardware ID
+//            Name (WLDP, 0xFF)
+//            Method (_STA, 0, NotSerialized)  // _STA: Status
+//            {
+//                If ((WLDP == 0xFF))
+//                {
+//                    Local0 = Zero
+//                    OSTP ()
+//                    If ((((OSYS == 0x07DC) || (OSYS == 0x07DD)) || (OSYS == 0x07DF)))
+//                    {
+//                        If (((WLVD != Zero) && (WLVD != 0xFFFF)))
+//                        {
+//                            Local0 = 0x0F
+//                        }
+//                    }
+//
+//                    WLDP = Local0
+//                }
+//
+//                Return (WLDP) /* \_SB_.WLBU.WLDP */
+//            }
+//        }
 
         Name (LSTA, One)
         Device (LID)
@@ -9202,7 +9205,7 @@ DefinitionBlock ("", "DSDT", 1, "HPQOEM", "SLIC-MPC", 0x00040000)
 
     Scope (\)
     {
-        OperationRegion (COMP, SystemMemory, 0xDFB75C98, 0x0200)
+        OperationRegion (COMP, SystemMemory, 0xDFB75C98, 0x00000200)
         Field (COMP, AnyAcc, Lock, Preserve)
         {
             IDMN,   16, 
@@ -10375,17 +10378,18 @@ DefinitionBlock ("", "DSDT", 1, "HPQOEM", "SLIC-MPC", 0x00040000)
             PWRS = Zero
         }
 
-        Method (_Q40, 0, NotSerialized)  // _Qxx: EC Query
-        {
-            P80H = 0x40
-            If ((((OSYS == 0x07DC) || (OSYS == 0x07DD)) || (OSYS == 0x07DF)))
-            {
-                Notify (WLBU, 0x80) // Status Change
-            }
-            Else
-            {
-            }
-        }
+// Mike edit, remove WMI stuff
+//        Method (_Q40, 0, NotSerialized)  // _Qxx: EC Query
+//        {
+//            P80H = 0x40
+//            If ((((OSYS == 0x07DC) || (OSYS == 0x07DD)) || (OSYS == 0x07DF)))
+//            {
+//                Notify (WLBU, 0x80) // Status Change
+//            }
+//            Else
+//            {
+//            }
+//        }
 
         Method (_Q42, 0, NotSerialized)  // _Qxx: EC Query
         {
